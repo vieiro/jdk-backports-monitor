@@ -35,6 +35,7 @@ import org.openjdk.backports.jira.*;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class ParityModel extends AbstractModel {
 
@@ -58,10 +59,13 @@ public class ParityModel extends AbstractModel {
         List<String> vers = new ArrayList<>();
 
         Project proj = jiraCli.getProjectClient().getProject("JDK").claim();
+        // We're interested in 11.0.2X only
+        Pattern PATTERN = Pattern.compile("11.0.[23][2-9].*");
         for (Version ver : proj.getVersions()) {
             String v = ver.getName();
             if (Versions.parseMajor(v) != majorVer) continue;
             if (Versions.isShared(v)) continue;
+            if (! PATTERN.matcher(v).matches()) continue;
             vers.add(v);
         }
 
